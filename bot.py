@@ -25,7 +25,15 @@ async def ping(ctx):
 
 @bot.command()
 async def sales(ctx):
-    await ctx.send(scraper.get_skin_sales())
+    skins = scraper.get_skin_sales()
+
+    if not skins:
+        await ctx.send("There was an issue getting the skins on sale.")
+        return
+
+    message = "**This Week's Skin Sales:**\n" + "\n".join(skins)
+
+    await ctx.send(message)
 
 
 bot.run(TOKEN)

@@ -11,7 +11,7 @@ def get_skin_sales():
         page.raise_for_status()
 
         soup = BeautifulSoup(page.text, "html.parser")
-        skins = soup.find_all("strong")
-        return [skin.text.strip() for skin in skins if skin.text.strip()]
+        skin_data = soup.find_all("strong")
+        return [skin.text.strip() for skin in skin_data if skin.text.strip()]
     except Exception as e:
         return [f"Error fetching skins: {e}"]
