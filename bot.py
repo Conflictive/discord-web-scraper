@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-import scraper
+import skins_manager.scraper as scraper
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
@@ -25,6 +25,7 @@ async def ping(ctx):
 
 @bot.command()
 async def sales(ctx):
+    """Gets current skin sales from the web scraper and formats and returns them to the user"""
     skins = scraper.get_skin_sales()
 
     if not skins:

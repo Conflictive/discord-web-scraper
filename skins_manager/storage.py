@@ -1,10 +1,10 @@
 import json
-import validator
+import skins_manager.fetcher as fetcher
 
 
-def store_file():
+def store_skin_data():
     """Fetches skin information and then stores it into a json file to be used for validation"""
-    skins = validator.get_skin_data()
+    skins = fetcher.get_skin_data()
 
     skins_json = json.dumps(skins, indent=4)
 
@@ -13,4 +13,4 @@ def store_file():
 
 
 if __name__ == "__main__":
-    store_file()
+    store_skin_data()
