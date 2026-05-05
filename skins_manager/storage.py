@@ -1,5 +1,16 @@
 import json
+from pathlib import Path
 import skins_manager.fetcher as fetcher
+
+# Get to the root
+BASE_DIR = Path(__file__).parent.parent
+# Target the data file
+DATA_DIR = BASE_DIR / "data"
+# Target the skins.json file
+FILE_PATH = DATA_DIR / "skins.json"
+
+# Make data file if it doesn't exist
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def store_skin_data():
@@ -8,9 +19,8 @@ def store_skin_data():
 
     skins_json = json.dumps(skins, indent=4)
 
-    with open("skins.json", "w", encoding="utf-8") as f:
+    with open(FILE_PATH, "w", encoding="utf-8") as f:
         f.write(skins_json)
 
 
-if __name__ == "__main__":
-    store_skin_data()
+store_skin_data()
