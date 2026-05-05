@@ -8,7 +8,7 @@ def store_file():
 
     skins_json = json.dumps(skins, indent=4)
 
-    with open("skins.json", "w") as f:
+    with open("skins.json", "w", encoding="utf-8") as f:
         f.write(skins_json)
 
 
