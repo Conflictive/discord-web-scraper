@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 import skins_manager.scraper as scraper
+import skins_manager.validator as validator
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
@@ -35,6 +36,12 @@ async def sales(ctx):
     message = "**This Week's Skin Sales:**\n" + "\n".join(skins)
 
     await ctx.send(message)
+
+
+@bot.command()
+async def skin_exist(ctx, *, message):
+    """Check if the users input is a valid skin"""
+    await ctx.send(validator.check_skin(message))
 
 
 bot.run(TOKEN)
