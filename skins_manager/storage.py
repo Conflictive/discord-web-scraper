@@ -19,8 +19,12 @@ def store_skin_data():
 
     skins_json = json.dumps(skins, indent=4)
 
-    with open(FILE_PATH, "w", encoding="utf-8") as f:
-        f.write(skins_json)
+    with open(FILE_PATH, "w", encoding="utf-8") as file:
+        file.write(skins_json)
 
 
-store_skin_data()
+def open_skin_file():
+    "Opens the json containing all valid skins and returning them as a list"
+    with open(FILE_PATH, "r", encoding="utf-8") as file:
+        data = json.load(file)
+        return data
