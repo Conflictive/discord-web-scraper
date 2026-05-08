@@ -1,5 +1,12 @@
 """
-A cog for skin commands, includes skin validation and fetching skin sale lists.
+cogs.skin_commands
+~~~~~~~~~~~~~~~~~~
+This module contains the 'SkinCommands' Cog, providing commands for any skin related functions.
+It handles skin validation from user input and fetching and displaying current skin sales.
+
+Key Commands:
+    - !sales: Fetches and returns the list of current skin sales.
+    - !skin_exist: Validates if a skin name is legitimate.
 """
 
 from discord.ext import commands

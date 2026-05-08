@@ -1,6 +1,6 @@
 """
 cogs.utilities
-
+~~~~~~~~~~~~~~~
 This module contains the 'Utilities' Cog, providing general purpose commands and event listeners.
 It handles the on_ready listener and basic connectivity checks using bot.latency
 
