@@ -1,5 +1,12 @@
 """
-A cog for simple utility commands, includes general utility such as latency and on_ready commands
+cogs.utilities
+
+This module contains the 'Utilities' Cog, providing general purpose commands and event listeners.
+It handles the on_ready listener and basic connectivity checks using bot.latency
+
+Key Commands:
+    - !ping: Returns bot latency.
+    - on_ready: Executes function on startup.
 """
 
 from discord.ext import commands
