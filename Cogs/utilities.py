@@ -1,38 +1,35 @@
+"""
+A cog for simple utility commands, includes general utility such as latency and on_ready commands
+"""
+
 from discord.ext import commands
-from skins_manager import validator, scraper
 
 
 class Utilities(commands.Cog):
+    """
+    General utility commands and event listeners for the bot.
+
+    This cog provides basic commands like ping and lifecycle event handlers
+    such as on_ready.
+
+    Attributes:
+        bot (commands.Bot): The instance of the running Discord bot.
+    """
+
     def __init__(self, bot):
         self.bot = bot
-        self._last_member = None
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """Prints a confirmation of log in into the terminal once the bot is started"""
         print(f"We have logged in as {self.bot.user}")
 
     @commands.command()
     async def ping(self, ctx):
+        """Returns the latency of the bots response as a message"""
         await ctx.send(f"Pong! {round(self.bot.latency * 1000)}ms")
-
-    @commands.command()
-    async def sales(self, ctx):
-        """Gets current skin sales from the web scraper and formats and returns them to the user"""
-        skins = scraper.get_skin_sales()
-
-        if not skins:
-            await ctx.send("There was an issue getting the skins on sale.")
-            return
-
-        message = "**This Week's Skin Sales:**\n" + "\n".join(skins)
-
-        await ctx.send(message)
-
-    @commands.command()
-    async def skin_exist(self, ctx, *, message):
-        """Check if the users input is a valid skin"""
-        await ctx.send(validator.check_skin(message))
 
 
 async def setup(bot):
+    """Setup function is used to load the cog when the extension is loaded."""
     await bot.add_cog(Utilities(bot))
