@@ -24,6 +24,10 @@ TOKEN = os.getenv("TOKEN")
 
 
 class Bot:
+    """
+    Bot setup that configures intents and loads all of the command Cogs from the ./cogs directory.
+    """
+
     def __init__(self):
         # 2. Configure Intents: Required for reading message content in prefix commands
         intents = discord.Intents.default()
@@ -34,6 +38,7 @@ class Bot:
     async def load_extensions(self):
         """Iterates through the cogs folder and registers each Python file as an extension."""
         for filename in os.listdir("./cogs"):
+            # Avoid using including __init__.py
             if filename.endswith(".py") and filename != "__init__.py":
                 # Load using dot-notation: cogs.filename
                 # filename[:-3] removes the file extension

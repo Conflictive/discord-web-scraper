@@ -10,7 +10,7 @@ Key Commands:
 """
 
 from discord.ext import commands
-from skins_manager import scraper, validator
+from skins_manager import scraper, validator, storage
 
 
 class SkinCommands(commands.Cog):
@@ -32,7 +32,7 @@ class SkinCommands(commands.Cog):
         # 1. Fetch data from the scraper logic in the skins_manager package
         skins = scraper.get_skin_sales()
 
-        # 2. Handle the cases where the scraper failes (timeouts, 404, etc) gracefully
+        # 2. Handle the cases where the scraper fails (timeouts, 404, etc) gracefully
         if not skins:
             await ctx.send("There was an issue getting the skins on sale.")
             return
@@ -47,6 +47,22 @@ class SkinCommands(commands.Cog):
         """Check if the users input is a valid skin"""
         # Uses the validator module to compare the user input to the valid list in the json file
         await ctx.send(validator.check_skin(message))
+
+    @commands.command(usage="!skins <champion> (Example: !skins kha'zix)")
+    async def skins(self, ctx, *, message):
+        """Returns a list containing all of a champions skins"""
+        skins = storage.open_skin_file()
+        champion_skins = [skin for skin in skins if skin.endswith(message)]
+        champion_name = champion_skins[0]
+        champion_skins.pop(0)
+
+        reply = f"**{champion_name}:**\n" + "\n".join(champion_skins)
+        await ctx.send(reply)
+
+    @skins.error
+    async def skins_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("**Missing Champion**\n " + ctx.command.usage)
 
 
 async def setup(bot):

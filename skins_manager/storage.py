@@ -9,7 +9,7 @@ It also opens that same JSON file to be used by the validator module using open_
 Dependencies:
     - json: For reading and writing to json files
     - Path: For constructing a path variable for the file
-    - Fetcher: Module to get the skin data before writing
+    - fetcher: Module to get the skin data before writing
 """
 
 import json
