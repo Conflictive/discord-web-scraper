@@ -8,7 +8,7 @@ Dependencies:
     - config: Exposes `Base` (DeclarativeBase) used as the model base class.
 """
 
-from sqlalchemy import Integer, String, BigInteger
+from sqlalchemy import Integer, String, BigInteger, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from config import Base
 
@@ -41,3 +41,20 @@ class Skin(Base):
 
     def __repr__(self) -> str:
         return f"<Skin:{self.name}>"
+
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    # Foreign keys
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.discord_id", ondelete="CASCADE"), nullable=False
+    )
+    skin_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("skins.id", ondelete="CASCADE"), nullable=False
+    )
+
+    def __repr__(self) -> str:
+        return f"<Subscription User:{self.user_id} -> Skin:{self.skin_id}>"
