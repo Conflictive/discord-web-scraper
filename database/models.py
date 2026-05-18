@@ -8,16 +8,26 @@ Dependencies:
     - config: Exposes `Base` (DeclarativeBase) used as the model base class.
 """
 
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 from config import Base
 
 
 class User(Base):
-    __tablename__ = "Users"
+    __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    discord_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
 
     def __repr__(self) -> str:
         return f"<User ID:{self.id} Username: {self.username}"
+
+
+class Champion(Base):
+    __tablename__ = "champions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+
+    def __repr__(self) -> str:
+        return f"<Champion:{self.name}>"
