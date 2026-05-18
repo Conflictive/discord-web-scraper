@@ -31,3 +31,13 @@ class Champion(Base):
 
     def __repr__(self) -> str:
         return f"<Champion:{self.name}>"
+
+
+class Skin(Base):
+    __tablename__ = "skins"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+
+    def __repr__(self) -> str:
+        return f"<Skin:{self.name}>"
