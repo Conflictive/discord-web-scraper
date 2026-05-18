@@ -2,7 +2,7 @@
 skins_manager.fetcher
 ~~~~~~~~~~~~~~~~~~~~~~
 This module handles API calls to the LoL community API to obtain an updated
-and accurate list of all existing skins.
+and accurate list of all existing skins + champions.
 
 Dependencies:
     - requests: For network calls.
@@ -16,10 +16,16 @@ SKINS_URL = (
     "global/default/v1/skins.json"
 )
 
+# URL for all champions
+CHAMPIONS_URL = (
+    "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/"
+    "global/default/v1/champion-summary.json"
+)
+
 
 def get_skin_data():
     """
-    Fetches skin + champion data from the API to use as validation for user input
+    Fetches skin data from the API to use as validation for user input
 
     Returns:
         - list[str]: A list of all existing skins in the game
@@ -28,6 +34,8 @@ def get_skin_data():
     # Attempt to reach the page; wrap in try/except to handle outages
     try:
         request = requests.get(SKINS_URL, timeout=10)
+        request.raise_for_status()
+
         data = request.json()
         # Only the name is relevant
         skins = [skin.get("name") for skin in data.values()]
@@ -37,3 +45,31 @@ def get_skin_data():
         # to be handled by the calling function
         print(f"Error fetching skin data: {e}")
         return None
+
+
+def get_champion_data():
+    """
+    Fetches champion data from the API to use as validation for user input
+
+    Returns:
+        - list[str]: A list of all existing champions in the game
+        - None: If any network or request error occurs.
+    """
+    try:
+        request = requests.get(CHAMPIONS_URL, timeout=10)
+        request.raise_for_status()
+
+        data = request.json()
+
+        # TODO: Ignore first entry which is 'None', Remove doom bots from the list
+        champions = [champ.get("name") for champ in data]
+        print(champions)
+        return champions
+    except requests.RequestException as e:
+        # If the site is down or slow, log the error and return None
+        # to be handled by the calling function
+        print(f"Error fetching champion data: {e}")
+        return None
+
+
+get_champion_data()
