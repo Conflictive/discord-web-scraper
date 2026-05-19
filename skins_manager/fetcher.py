@@ -66,7 +66,7 @@ def get_champion_data():
         # Get a clean list of champions that removes the doom bots
         # and the 'None' champion that is at position 1
         champions = [
-            {"name": champ.get("name")}
+            {"id": champ.get("id"), "name": champ.get("name")}
             for champ in data
             if champ.get("name") != "None" and not champ["name"].startswith("Doom")
         ]
@@ -79,4 +79,4 @@ def get_champion_data():
         return None
 
 
-get_skin_data()
+get_champion_data()

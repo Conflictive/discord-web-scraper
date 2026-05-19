@@ -33,7 +33,7 @@ class Champion(Base):
     __tablename__ = "champions"
 
     # Columns
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
 
     # Relationships
@@ -48,7 +48,7 @@ class Skin(Base):
     __tablename__ = "skins"
 
     # Columns
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
 
     # Foreign Keys
