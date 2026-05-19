@@ -37,8 +37,10 @@ def get_skin_data():
         request.raise_for_status()
 
         data = request.json()
+        print(data)
         # Only the name is relevant
         skins = [skin.get("name") for skin in data.values()]
+
         return skins
     except requests.RequestException as e:
         # If the site is down or slow, log the error and return None
@@ -77,4 +79,4 @@ def get_champion_data():
         return None
 
 
-get_champion_data()
+get_skin_data()

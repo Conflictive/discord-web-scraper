@@ -1,5 +1,5 @@
 """
-config.py
+database.config.py
 ~~~~~~~~~~~~~~~~
 This module is for setting up and configuring the connection to the PostgreSQL database
 
@@ -24,7 +24,7 @@ db_pass = os.environ.get("DB_PASS")
 db_pass = urllib.parse.quote_plus(db_pass)
 
 DATABASE_URL = f"postgresql+psycopg2://{db_user}:{db_pass}@{db_url}"
-print(DATABASE_URL)
+
 engine = create_engine(DATABASE_URL, echo=True)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

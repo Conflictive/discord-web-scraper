@@ -1,5 +1,5 @@
 """
-models.py
+database.models.py
 ~~~~~~~~~~
 This module is for creating the tables for the database
 
@@ -8,10 +8,10 @@ Dependencies:
     - config: Exposes `Base` (DeclarativeBase) used as the model base class.
 """
 
+from __future__ import annotations
 from sqlalchemy import Integer, String, BigInteger, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from config import Base
-from __future__ import annotations
+from database.config import Base
 
 
 class User(Base):
@@ -22,7 +22,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
 
     def __repr__(self) -> str:
-        return f"<User ID:{self.id} Username: {self.username}"
+        return f"<User ID:{self.discord_id} Username: {self.username}"
 
     # Relationships
     # A user can have many subscriptions
@@ -53,7 +53,7 @@ class Skin(Base):
 
     # Foreign Keys
     champion_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("champion.id"), nullable=False
+        Integer, ForeignKey("champions.id"), nullable=False
     )
 
     # Relationships
