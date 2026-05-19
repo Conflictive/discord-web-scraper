@@ -61,9 +61,14 @@ def get_champion_data():
 
         data = request.json()
 
-        # TODO: Ignore first entry which is 'None', Remove doom bots from the list
-        champions = [champ.get("name") for champ in data]
-        print(champions)
+        # Get a clean list of champions that removes the doom bots
+        # and the 'None' champion that is at position 1
+        champions = [
+            {"name": champ.get("name")}
+            for champ in data
+            if champ.get("name") != "None" and not champ["name"].startswith("Doom")
+        ]
+
         return champions
     except requests.RequestException as e:
         # If the site is down or slow, log the error and return None
