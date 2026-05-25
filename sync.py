@@ -14,26 +14,31 @@ Dependencies:
 import skins_manager.fetcher as fetcher
 import database.crud as crud
 import database.models as models
+import asyncio
 
 
-def update_champions():
+async def update_champions():
     """
     Gets champion data from API and writes it to the database
     """
     champ_data = fetcher.get_champion_data()
-    crud.bulk_db_write(models.Champion, champ_data)
+    await crud.bulk_db_write(models.Champion, champ_data)
     print("champions table successfully updated.")
 
 
-def update_skins():
+async def update_skins():
     """
     Gets skin data from API and writes it to the database
     """
     skin_data = fetcher.get_skin_data()
-    crud.bulk_db_write(models.Skin, skin_data)
+    await crud.bulk_db_write(models.Skin, skin_data)
     print("skins table successfully updated.")
 
 
+async def main():
+    await update_champions()
+    await update_skins()
+
+
 if __name__ == "__main__":
-    # update_champions()
-    update_skins()
+    asyncio.run(main())

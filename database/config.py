@@ -13,8 +13,8 @@ Dependencies:
 import os
 import urllib.parse
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase
 
 load_dotenv()
 
@@ -23,20 +23,14 @@ db_user = os.environ.get("DB_USER")
 db_pass = os.environ.get("DB_PASS")
 db_pass = urllib.parse.quote_plus(db_pass)
 
-DATABASE_URL = f"postgresql+psycopg2://{db_user}:{db_pass}@{db_url}"
+DATABASE_URL = f"postgresql+asyncpg://{db_user}:{db_pass}@{db_url}"
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL, echo=True)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+AsyncSessionLocal = async_sessionmaker(
+    autoflush=False, bind=engine, expire_on_commit=False
+)
 
 
 class Base(DeclarativeBase):
     pass
-
-
-if __name__ == "__main__":
-    try:
-        with engine.connect() as connection:
-            print("Successfully connected to the database!")
-    except Exception as e:
-        print(f"Connection failed: {e}")

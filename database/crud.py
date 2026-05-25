@@ -6,11 +6,11 @@ Database module for all CRUD operations
 
 from database.config import engine
 import database.models as models
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 
 
-def bulk_db_write(models_class, data):
+async def bulk_db_write(models_class, data):
     """
     Writes bulk data (lists) to the database
 
@@ -19,7 +19,10 @@ def bulk_db_write(models_class, data):
         data (List[dict]): A list of champion dictionaries containing the following keys:
             - name(str): The champion's name
     """
-    with Session(engine) as session, session.begin():
-        # Duplicates are ignored whilst new data is written
-        statement = insert(models_class).on_conflict_do_nothing(index_elements=["name"])
-        session.execute(statement, data)
+    async with AsyncSession(engine) as session:
+        async with session.begin():
+            # Duplicates are ignored whilst new data is written
+            statement = insert(models_class).on_conflict_do_nothing(
+                index_elements=["name"]
+            )
+            await session.execute(statement, data)

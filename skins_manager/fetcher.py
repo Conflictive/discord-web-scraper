@@ -5,10 +5,10 @@ This module handles API calls to the LoL community API to obtain an updated
 and accurate list of all existing skins + champions.
 
 Dependencies:
-    - requests: For network calls.
+    - httpx: For network calls.
 """
 
-import requests
+import httpx
 
 # URL to the LoL community API, specifically for all skins
 SKINS_URL = (
@@ -23,7 +23,7 @@ CHAMPIONS_URL = (
 )
 
 
-def get_skin_data():
+async def get_skin_data():
     """
     Fetches skin data from the API to use as validation for user input
 
@@ -36,46 +36,46 @@ def get_skin_data():
         - None: If any network or request error occurs.
     """
     # Attempt to reach the page; wrap in try/except to handle outages
-    try:
-        request = requests.get(SKINS_URL, timeout=10)
-        request.raise_for_status()
+    async with httpx.AsyncClient as client:
+        try:
+            request = client.get(SKINS_URL, timeout=10)
+            request.raise_for_status()
 
-        data = request.json()
-        clean_skins = []
+            data = request.json()
+            clean_skins = []
 
-        for skin_id, skin_info in data.items():
-            # The base skin is always just the champion itself
-            # We already have a database of all champions so this is redundant
-            if skin_info.get("isBase"):
-                continue
+            for skin_id, skin_info in data.items():
+                # The base skin is always just the champion itself
+                # We already have a database of all champions so this is redundant
+                if skin_info.get("isBase"):
+                    continue
 
-            skin_id = int(skin_id)
+                skin_id = int(skin_id)
 
-            # Base skin ids in the API are created by multiplying the champion id by 1000.
-            # For example Jinx's id is 222 so her base skin is 222000.
-            # So each actual skin is this base skin id + 1 for each skin.
-            # Dividing by 1000 gives you the champions id
-            champion_id = skin_id // 1000
+                # Base skin ids in the API are created by multiplying the champion id by 1000.
+                # For example Jinx's id is 222 so her base skin is 222000.
+                # So each actual skin is this base skin id + 1 for each skin.
+                # Dividing by 1000 gives you the champions id
+                champion_id = skin_id // 1000
 
-            # The data needs to be cleaned so that it matches the columns of the database
-            clean_skins.append(
-                {
-                    "id": skin_id,
-                    "name": skin_info.get("name"),
-                    "champion_id": champion_id,
-                }
-            )
+                # The data needs to be cleaned so that it matches the columns of the database
+                clean_skins.append(
+                    {
+                        "id": skin_id,
+                        "name": skin_info.get("name"),
+                        "champion_id": champion_id,
+                    }
+                )
 
-        return clean_skins
+            return clean_skins
+        except httpx.RequestError as e:
+            # If the site is down or slow, log the error and return None
+            # to be handled by the calling function
+            print(f"Error fetching skin data: {e}")
+            return None
 
-    except requests.RequestException as e:
-        # If the site is down or slow, log the error and return None
-        # to be handled by the calling function
-        print(f"Error fetching skin data: {e}")
-        return None
 
-
-def get_champion_data():
+async def get_champion_data():
     """
     Fetches champion data from the API to use as validation for user input. Removes irrelevant data (doom bots)
 
@@ -86,26 +86,24 @@ def get_champion_data():
 
         - None: If any network or request error occurs.
     """
-    try:
-        request = requests.get(CHAMPIONS_URL, timeout=10)
-        request.raise_for_status()
+    async with httpx.AsyncClient as client:
+        try:
+            request = client.get(CHAMPIONS_URL, timeout=10)
+            request.raise_for_status()
 
-        data = request.json()
+            data = request.json()
 
-        # Get a clean list of champions that removes the doom bots
-        # and the 'None' champion that is at position 1
-        champions = [
-            {"id": champ.get("id"), "name": champ.get("name")}
-            for champ in data
-            if champ.get("name") != "None" and not champ["name"].startswith("Doom")
-        ]
+            # Get a clean list of champions that removes the doom bots
+            # and the 'None' champion that is at position 1
+            champions = [
+                {"id": champ.get("id"), "name": champ.get("name")}
+                for champ in data
+                if champ.get("name") != "None" and not champ["name"].startswith("Doom")
+            ]
 
-        return champions
-    except requests.RequestException as e:
-        # If the site is down or slow, log the error and return None
-        # to be handled by the calling function
-        print(f"Error fetching champion data: {e}")
-        return None
-
-
-get_skin_data()
+            return champions
+        except httpx.RequestError as e:
+            # If the site is down or slow, log the error and return None
+            # to be handled by the calling function
+            print(f"Error fetching champion data: {e}")
+            return None
