@@ -36,7 +36,7 @@ async def get_skin_data():
         - None: If any network or request error occurs.
     """
     # Attempt to reach the page; wrap in try/except to handle outages
-    async with httpx.AsyncClient as client:
+    async with httpx.AsyncClient() as client:
         try:
             request = client.get(SKINS_URL, timeout=10)
             request.raise_for_status()
@@ -86,7 +86,7 @@ async def get_champion_data():
 
         - None: If any network or request error occurs.
     """
-    async with httpx.AsyncClient as client:
+    async with httpx.AsyncClient() as client:
         try:
             request = client.get(CHAMPIONS_URL, timeout=10)
             request.raise_for_status()
