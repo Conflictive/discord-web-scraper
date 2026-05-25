@@ -1,9 +1,4 @@
 from skins_manager.scraper import get_skin_sales
-import warnings
-
-warnings.filterwarnings(
-    "ignore", category=DeprecationWarning, message=".*set_event_loop_policy.*"
-)
 
 
 async def test_get_skin_sales_returns_valid_data():
