@@ -6,11 +6,13 @@ It targets the skin name, current and old prices and also the size of the discou
 
 Dependencies:
     BeautifulSoup4: For HTML parsing.
-    httpx: For async network calls.
+    httpx: For async network error handling.
+    curl_cffi: For async network calls
 """
 
 from bs4 import BeautifulSoup
 import httpx
+from curl_cffi.requests import AsyncSession
 
 # URL to the mobalytics weekly skin sale page
 URL = "https://mobalytics.gg/lol/guides/weekly-skin-sale"
@@ -26,9 +28,9 @@ async def get_skin_sales():
     """
 
     # Attempt to reach the page; wrap in try/except to handle outages
-    async with httpx.AsyncClient() as client:
+    async with AsyncSession() as client:
         try:
-            page = await client.get(URL)
+            page = await client.get(URL, impersonate="chrome")
             soup = BeautifulSoup(page.text, "html.parser")
             skin_data = soup.find_all("strong")
 
