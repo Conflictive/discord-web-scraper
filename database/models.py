@@ -99,15 +99,13 @@ class SkinSale(Base):
     # Columns
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
-    skin_id: Mapped[int] = (
-        mapped_column(
-            Integer, ForeignKey("skins.id", ondelete="CASCADE"), nullable=False
-        ),
+    skin_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("skins.id", ondelete="CASCADE"), nullable=False
     )
 
     # Pricing data
-    sale_price = Mapped[int] = mapped_column(Integer, nullable=False)
-    original_price = Mapped[int] = mapped_column(Integer, nullable=False)
+    sale_price: Mapped[int] = mapped_column(Integer, nullable=False)
+    original_price: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # Dates to determine what is currently on sale and what was on sale
     start_date: Mapped[datetime] = mapped_column(
