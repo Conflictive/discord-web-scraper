@@ -8,14 +8,31 @@ Dependencies:
     BeautifulSoup4: For HTML parsing.
     httpx: For async network error handling.
     curl_cffi: For async network calls
+    database.crud: For performing database operations
+    database.models: To be able to target database tables
+    re: For using a regex to get the sale numbers from the scraper
 """
 
 from bs4 import BeautifulSoup
 import httpx
+import database.crud as crud
+import database.models as models
+import re
 from curl_cffi.requests import AsyncSession
 
 # URL to the mobalytics weekly skin sale page
 URL = "https://mobalytics.gg/lol/guides/weekly-skin-sale"
+
+
+def clean_name(name):
+    """Removes colons, hyphens, spaces, and forces lowercase for uniform matching."""
+    # 1. Force lowercase
+    name = name.lower()
+    # 2. Strip out colons, hyphens, apostrophes, etc.
+    name = re.sub(r"[:'\-\.]", "", name)
+    # 3. Strip all spaces entirely so "project yasuo" matches "projectyasuo"
+    name = "".join(name.split())
+    return name
 
 
 async def get_skin_sales():
@@ -32,9 +49,33 @@ async def get_skin_sales():
         try:
             page = await client.get(URL, impersonate="chrome")
             soup = BeautifulSoup(page.text, "html.parser")
-            skin_data = soup.find_all("strong")
+            sale_data = soup.find_all("strong")
+            all_sale_data = [sale.get_text(strip=True) for sale in sale_data]
 
-            return [skin.text.strip() for skin in skin_data if skin.text.strip()]
+            skin_map = await crud.get_skin_name_to_id_map()
+            # Transform {"PROJECT Yasuo": 33005} -> {"projectyasuo": 33005}
+            skin_map = {clean_name(name): skin_id for name, skin_id in skin_map.items()}
+
+            sales = []
+
+            for sale in all_sale_data:
+                values = sale.rsplit("-", 2)
+
+                skin_name = clean_name(values[0])
+                prices = values[1]
+
+                price = re.findall(r"\d+", prices)
+
+                sales.append(
+                    {
+                        "skin_id": skin_map[skin_name],
+                        "sale_price": int(price[0]),
+                        "original_price": int(price[1]),
+                        "end_date": None,
+                    }
+                )
+
+            return sales
         except httpx.RequestError as e:
             # If the site is down or slow, log the error and return None
             # to be handled by the calling function

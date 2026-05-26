@@ -23,7 +23,11 @@ async def bulk_db_write(models_class, data):
     # Duplicates are ignored whilst new data is written
 
     async with AsyncSessionLocal() as session:
-        statement = insert(models_class).on_conflict_do_nothing(index_elements=["name"])
+        statement = insert(models_class)
+
+        if hasattr(models_class, "name"):
+            statement = statement.on_conflict_do_nothing(index_elements=["name"])
+
         await session.execute(statement, data)
         await session.commit()
 
@@ -44,3 +48,12 @@ async def get_all_from_table(models_class):
         result = await session.execute(statement)
 
         return result.scalars().all()
+
+
+async def get_skin_name_to_id_map():
+    """Fetches all skins once and returns a dict mapping {name: id}"""
+
+    async with AsyncSessionLocal() as session:
+        statement = select(models.Skin.name, models.Skin.id)
+        result = await session.execute(statement)
+        return dict(result.all())
