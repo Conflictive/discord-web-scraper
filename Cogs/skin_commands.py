@@ -11,7 +11,7 @@ Key Commands:
 
 from discord.ext import commands
 from skins_manager import validator, storage
-import database.crud as crud
+import database.crud_skins as crud
 import database.models as models
 
 
