@@ -40,7 +40,7 @@ async def get_all_from_table(models_class):
         models_class (DeclarativeBase): Class to target the relevant table
 
     Returns:
-        list: list containing SQLAlchemy model objects
+        list: containing SQLAlchemy model objects
     """
     statement = select(models_class)
 
@@ -51,7 +51,12 @@ async def get_all_from_table(models_class):
 
 
 async def get_skin_name_to_id_map():
-    """Fetches all skins once and returns a dict mapping {name: id}"""
+    """
+    Fetches all skins once and returns a dict mapping {name: id}
+
+    Returns:
+        dict: in the format {name: id} ({Rammus: 33})
+    """
 
     async with AsyncSessionLocal() as session:
         statement = select(models.Skin.name, models.Skin.id)
@@ -60,9 +65,38 @@ async def get_skin_name_to_id_map():
 
 
 async def get_active_sales_with_skins():
-    """Fetches all sales and loads their connected skin models."""
+    """
+    Fetches all sales and loads their connected skin models.
+
+    Returns:
+        list: containing SQLAlchemy model objects
+    """
     async with AsyncSessionLocal() as session:
         statement = select(models.SkinSale).options(selectinload(models.SkinSale.skin))
 
         result = await session.execute(statement)
         return result.scalars().all()
+
+
+async def get_champion_skins(champion_name):
+    """
+    Fetches all skins that belong to a specific champion
+
+    Args:
+        champion_name (str): user input of a champion's name
+
+    Returns:
+        list[str]: containing the champions skin names
+    """
+
+    async with AsyncSessionLocal() as session:
+        statement = (
+            select(models.Champion)
+            .options(selectinload(models.Champion.skins))
+            .where(models.Champion.name == champion_name)
+        )
+
+        result = await session.execute(statement)
+        champion = result.scalars().first()
+
+        return [skin.name for skin in champion.skins]

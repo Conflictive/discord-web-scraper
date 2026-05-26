@@ -90,31 +90,14 @@ class SkinCommands(commands.Cog):
             A formatted Discord message with the champion name and their complete skin list.
         """
 
-        # Temp solution to prevent single letter matching
-        # Example: !skins t would return both urgot and sett currently because of how endswith works
-        if len(message) < 3:
-            return
+        skins = await crud.get_champion_skins(message)
 
-        skins = await storage.open_skin_file()
+        # TODO: Improve error handling to be more specific and robust
+        if len(skins) < 1:
+            reply = "Something went wrong."
+        else:
+            reply = f"**{message}:**\n" + "\n".join(skins)
 
-        # Remove any trailing whitespace from the message
-        # Make the message lowercase for easier comparison
-        # Remove spaces so both "miss fortune" and "missfortune" are valid
-        clean_message = message.strip().lower().replace(" ", "")
-
-        # Gets all skins that have the matching champion name
-        champion_skins = [
-            skin
-            for skin in skins
-            if skin.lower().replace(" ", "").endswith(clean_message)
-        ]
-
-        # Save and remove the champion name
-        # The first index holds only the champion name e.g "Rammus"
-        champion_name = champion_skins[0]
-        champion_skins.pop(0)
-
-        reply = f"**{champion_name}:**\n" + "\n".join(champion_skins)
         await ctx.send(reply)
 
     @commands.Cog.listener()
