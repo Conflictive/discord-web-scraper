@@ -9,9 +9,10 @@ Dependencies:
 """
 
 from __future__ import annotations
-from sqlalchemy import Integer, String, BigInteger, ForeignKey
+from sqlalchemy import Integer, String, BigInteger, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.config import Base
+from datetime import datetime, timezone
 
 
 class User(Base):
@@ -59,8 +60,10 @@ class Skin(Base):
     # Relationships
     # A skin can have many subscriptions
     # Skins have one champion they belong to
+    # Skins have multiple sales
     subscriptions: Mapped[list["Subscription"]] = relationship(back_populates="skin")
     champion: Mapped["Champion"] = relationship(back_populates="skins")
+    sales: Mapped[list["SkinSale"]] = relationship(back_populates="skin")
 
     def __repr__(self) -> str:
         return f"<Skin:{self.name}>"
@@ -88,3 +91,32 @@ class Subscription(Base):
 
     def __repr__(self) -> str:
         return f"<Subscription User:{self.user_id} -> Skin:{self.skin_id}>"
+
+
+class SkinSale(Base):
+    __tablename__ = "skin_sales"
+
+    # Columns
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    skin_id: Mapped[int] = (
+        mapped_column(
+            Integer, ForeignKey("skins.id", ondelete="CASCADE"), nullable=False
+        ),
+    )
+
+    # Pricing data
+    sale_price = Mapped[int] = mapped_column(Integer, nullable=False)
+    original_price = Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # Dates to determine what is currently on sale and what was on sale
+    start_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+    end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Relationships
+    # A sale has multiple skins
+    skin: Mapped["Skin"] = relationship(back_populates="sales")
