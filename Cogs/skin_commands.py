@@ -10,7 +10,9 @@ Key Commands:
 """
 
 from discord.ext import commands
-from skins_manager import scraper, validator, storage
+from skins_manager import validator, storage
+import database.crud as crud
+import database.models as models
 
 
 class SkinCommands(commands.Cog):
@@ -39,20 +41,13 @@ class SkinCommands(commands.Cog):
 
         Sends:
             A formatted Discord message with this week's skin sales list,
-            or an error message if the scraper fails.
+
         """
+        message = "**This week's skin sales:**\n"
 
-        # 1. Fetch data from the scraper logic in the skins_manager package
-        skins = scraper.get_skin_sales()
-
-        # 2. Handle the cases where the scraper fails (timeouts, 404, etc) gracefully
-        if not skins:
-            await ctx.send("There was an issue getting the skins on sale.")
-            return
-
-        # 3. Format the message into a single string using a join to avoid the need to send multiple messages which might exceed rate limits
-        message = "**This Week's Skin Sales:**\n" + "\n".join(skins)
-
+        skins = await crud.get_active_sales_with_skins()
+        for sale in skins:
+            message += f"• {sale.skin.name}: ~~{sale.original_price} RP~~ ➔ **{sale.sale_price} RP**\n"
         await ctx.send(message)
 
     @commands.command()
@@ -100,7 +95,7 @@ class SkinCommands(commands.Cog):
         if len(message) < 3:
             return
 
-        skins = storage.open_skin_file()
+        skins = await storage.open_skin_file()
 
         # Remove any trailing whitespace from the message
         # Make the message lowercase for easier comparison
