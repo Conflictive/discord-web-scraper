@@ -14,5 +14,5 @@ async def test_get_skin_sales_returns_valid_data():
 
     # If there are active sales, verify the list contains string names
     if len(result) > 0:
-        assert isinstance(result[0], str), "Expected skin names to be strings."
+        assert isinstance(result[0], dict), "Expected skin objects to be dictionaries."
         print(f"\nScraper working. Parsed sample data: {result[:3]}")
