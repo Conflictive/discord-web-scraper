@@ -6,9 +6,11 @@ and accurate list of all existing skins + champions.
 
 Dependencies:
     - httpx: For network calls.
+    - re: Regexes for cleaning champion and skin names
 """
 
 import httpx
+import re
 
 # URL to the LoL community API, specifically for all skins
 SKINS_URL = (
@@ -64,6 +66,9 @@ async def get_skin_data():
                         "id": skin_id,
                         "name": skin_info.get("name"),
                         "champion_id": champion_id,
+                        "search_name": re.sub(
+                            r"[\s'\-\.\/:,]", "", skin_info.get("name")
+                        ).lower(),
                     }
                 )
 
@@ -96,7 +101,13 @@ async def get_champion_data():
             # Get a clean list of champions that removes the doom bots
             # and the 'None' champion that is at position 1
             champions = [
-                {"id": champ.get("id"), "name": champ.get("name")}
+                {
+                    "id": champ.get("id"),
+                    "name": champ.get("name"),
+                    "search_name": re.sub(
+                        r"[\s'\-\.\/:,]", "", champ.get("name")
+                    ).lower(),
+                }
                 for champ in data
                 if champ.get("name") != "None" and not champ["name"].startswith("Doom")
             ]

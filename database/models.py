@@ -36,6 +36,7 @@ class Champion(Base):
     # Columns
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    search_name: Mapped[str] = mapped_column(String, index=True)
 
     # Relationships
     # A champion can have many skins
@@ -51,6 +52,7 @@ class Skin(Base):
     # Columns
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    search_name: Mapped[str] = mapped_column(String, index=True)
 
     # Foreign Keys
     champion_id: Mapped[int] = mapped_column(

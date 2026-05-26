@@ -9,6 +9,7 @@ import database.models as models
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.dialects.postgresql import insert
+import re
 
 
 async def get_skin_name_to_id_map():
@@ -49,15 +50,16 @@ async def get_champion_skins(champion_name):
     Returns:
         list[str]: containing the champions skin names
     """
+    champion_name = re.sub(r"[\s'\-\.\/:,]", "", champion_name).lower()
 
     async with AsyncSessionLocal() as session:
         statement = (
             select(models.Champion)
             .options(selectinload(models.Champion.skins))
-            .where(models.Champion.name == champion_name)
+            .where(models.Champion.search_name == champion_name)
         )
 
         result = await session.execute(statement)
         champion = result.scalars().first()
 
-        return [skin.name for skin in champion.skins]
+        return champion.name, [skin.name for skin in champion.skins]

@@ -89,14 +89,17 @@ class SkinCommands(commands.Cog):
         Sends:
             A formatted Discord message with the champion name and their complete skin list.
         """
+        try:
+            name, skins = await crud.get_champion_skins(message)
 
-        skins = await crud.get_champion_skins(message)
-
-        # TODO: Improve error handling to be more specific and robust
-        if len(skins) < 1:
+            # TODO: Improve error handling to be more specific and robust
+            if len(skins) < 1:
+                reply = "Something went wrong."
+            else:
+                reply = f"**{name}:**\n" + "\n".join(skins)
+        except Exception as e:
             reply = "Something went wrong."
-        else:
-            reply = f"**{message}:**\n" + "\n".join(skins)
+            print(e)
 
         await ctx.send(reply)
 
