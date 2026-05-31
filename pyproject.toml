@@ -9,4 +9,25 @@ filterwarnings = [
     "ignore:.*Proactor event loop.*:Warning"
 ]
 
+[tool.ruff]
+target-version = "py311"
+line-length = 88
 
+[tool.ruff.lint]
+# Enable standard formatting, syntax checks, and Docstrings
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (unused imports, undefined variables)
+    "D",   # pydocstyle (all docstring rules)
+]
+
+# Explicitly ignore magic methods
+ignore = [
+    "D105", # Missing docstring in magic method (e.g., __repr__)
+    "D107", # Missing docstring in __init__ (covered by class docstring)
+]
+
+[tool.ruff.lint.pydocstyle]
+
+convention = "google"

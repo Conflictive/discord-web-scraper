@@ -35,7 +35,7 @@ async def bulk_db_write(
 async def get_all_from_table(
     model_class: Type[DeclarativeBase],
 ) -> Sequence[DeclarativeBase]:
-    """Gets all records from a specified database table and flattens them into a clean list.
+    """Gets all records from a database table then flattens them into a clean list.
 
     Args:
         model_class: Class to target the relevant table

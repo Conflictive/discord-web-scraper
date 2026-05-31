@@ -1,7 +1,4 @@
-"""
-database.models.py
-~~~~~~~~~~
-This module is for creating the tables for the database
+"""Defines the layout of the tables in the database.
 
 Dependencies:
     - SQLAlchemy: `Mapped`, `mapped_column`, and SQL types used to define ORM models.
@@ -9,13 +6,24 @@ Dependencies:
 """
 
 from __future__ import annotations
-from sqlalchemy import Integer, String, BigInteger, ForeignKey, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from database.config import Base
+
 from datetime import datetime, timezone
+
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from database.config import Base
 
 
 class User(Base):
+    """Tracks all users that have interacted with the bot.
+
+    Attributes:
+        discord_id: The primary key identifier assigned by discord.
+        username: The username of the user
+
+    """
+
     __tablename__ = "users"
 
     # Columns
@@ -31,6 +39,16 @@ class User(Base):
 
 
 class Champion(Base):
+    """Tracks all champions that exist within the game.
+
+    This table stores every champion that is within the game obtained from the LoL API,
+
+    Attributes:
+        id: The primary key identifier assigned by Riot.
+        name: The name of the champion.
+        search_name: A cleaned version of the name to make comparison easier.
+    """
+
     __tablename__ = "champions"
 
     # Columns
@@ -47,6 +65,19 @@ class Champion(Base):
 
 
 class Skin(Base):
+    """Tracks all skins that exist within the game.
+
+    This table stores every skin that is within the game obtained from the LoL API,
+    it links skins directly to the champions registry table
+    via unique foreign key relations.
+
+    Attributes:
+        id: The primary key identifier assigned by Riot.
+        name: The name of the skin.
+        search_name: A cleaned version of the name to make comparison easier.
+        champion_id: Foreign key reference linking to the champions table.
+    """
+
     __tablename__ = "skins"
 
     # Columns
@@ -72,6 +103,17 @@ class Skin(Base):
 
 
 class Subscription(Base):
+    """Tracks active subscriptions from users for specific skins.
+
+    This table stores the subscription data of users that have subscribed to a skin,
+    linking a subscription to its user and their skin via unique foreign key relations.
+
+    Attributes:
+        id: The auto-incrementing primary key identifier.
+        user_id: Foreign key reference linking to the users table.
+        skin_id: Foreign key reference linking to the skins registry.
+    """
+
     __tablename__ = "subscriptions"
 
     # Columns
@@ -96,6 +138,21 @@ class Subscription(Base):
 
 
 class SkinSale(Base):
+    """Tracks active and historical League of Legends skin discounts.
+
+    This table stores the pricing data scraped from an external website ,
+    linking web-scraped sale entries directly to the skins inventory table
+    via unique foreign key relations.
+
+    Attributes:
+        id: The auto-incrementing primary key identifier.
+        skin_id: Foreign key reference linking to the master skins registry.
+        sale_price: The active discounted price in Riot Points (RP).
+        original_price: The base retail price of the skin before markdown.
+        start_data: Timestamp indicating when the sale pricing began.
+        end_date: Timestamp indicating when the sale pricing expires.
+    """
+
     __tablename__ = "skin_sales"
 
     # Columns

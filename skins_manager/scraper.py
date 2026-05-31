@@ -1,49 +1,48 @@
-"""
-skins_manager.scraper
-~~~~~~~~~~~~~~~~~~~~~~
-This module handles the web scraping on Mobalytics' weekly skin sale page.
-It targets the skin name, current and old prices and also the size of the discount.
+"""Handles the web scraping on Mobalytics' weekly skin sale page.
 
-Dependencies:
-    BeautifulSoup4: For HTML parsing.
-    httpx: For async network error handling.
-    curl_cffi: For async network calls
-    database.crud: For performing database operations
-    database.models: To be able to target database tables
-    re: For using a regex to get the sale numbers from the scraper
+The scraper targets specific DOM elements, bold text in this case
+to extract skin names, active sale prices, original retail prices,
+and percentage discounts.
 """
 
-from bs4 import BeautifulSoup
-import httpx
-import database.crud as crud
-import database.models as models
 import re
+from typing import Any
+
+import httpx
+from bs4 import BeautifulSoup
 from curl_cffi.requests import AsyncSession
+
+import database.crud as crud
 
 # URL to the mobalytics weekly skin sale page
 URL = "https://mobalytics.gg/lol/guides/weekly-skin-sale"
 
 
-def clean_name(name):
-    """Removes colons, hyphens, spaces, and forces lowercase for uniform matching."""
-    # 1. Force lowercase
-    name = name.lower()
-    # 2. Strip out colons, hyphens, apostrophes, etc.
-    name = re.sub(r"[:'\-\.]", "", name)
-    # 3. Strip all spaces entirely so "project yasuo" matches "projectyasuo"
-    name = "".join(name.split())
-    return name
+def clean_name(name: str) -> str:
+    """Removes colons, hyphens, spaces, and forces lowercase for uniform matching.
 
-
-async def get_skin_sales():
-    """
-    Fetches and returns the current list of skin sales.
+    Args:
+        name: Champion name or string obtained from the HTML.
 
     Returns:
-        - list[dict]: A list of all the skins that are currently on sale
-        - None: If any network or request error occurs.
+        A clean string with all special characters, whitespace and uppercase removed
     """
+    name = name.lower()
+    name = re.sub(r"[:'\-\.]", "", name)
+    return "".join(name.split())
 
+
+async def get_skin_sales() -> list[dict[str, Any] | None]:
+    """Fetches and processes the current list of skin sales.
+
+    Uses a browser impersonating HTTP client to scrape DOM elements from the site,
+    the sale details are extracted using a regex and then mapped according to
+    the fields of the database
+
+    Returns:
+        A list of dictionaries matching the schema requirements of the skin sales
+        database destination table, or None if a network connectivity exception occurs.
+    """
     # Attempt to reach the page; wrap in try/except to handle outages
     async with AsyncSession() as client:
         try:
@@ -53,10 +52,12 @@ async def get_skin_sales():
             # Remove HTML tags leaving just the sale data
             all_sale_data = [sale.get_text(strip=True) for sale in sale_data]
 
-            # Instead of running a query for each skin name that appears just create the entire map so only one query is used
+            # Instead of running a query for each skin name that appears
+            # just create the entire map so only one query is used
             skin_map = await crud.get_skin_name_to_id_map()
 
-            # Transform {"PROJECT Yasuo": 33005} -> {"projectyasuo": 33005} to avoid issues with certain skins that may have characters like :
+            # Transform {"PROJECT Yasuo": 33005} -> {"projectyasuo": 33005}
+            # to avoid issues with certain skins that may have special characters
             skin_map = {clean_name(name): skin_id for name, skin_id in skin_map.items()}
 
             sales = []
