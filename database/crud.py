@@ -1,102 +1,51 @@
-"""
-database.crud.py
-~~~~~~~~
-Database module for all CRUD operations
+"""Handles all generic asynchronous CRUD operations for the application database.
+
+This module provides reusable database utilities to prevent code
+duplication across different model tables
 """
 
-from database.config import engine, AsyncSessionLocal
-import database.models as models
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Any, Sequence, Type
+
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.orm import DeclarativeBase
+
+from database.config import AsyncSessionLocal
 
 
-async def bulk_db_write(models_class, data):
-    """
-    Writes bulk data (lists) to the database
+async def bulk_db_write(
+    model_class: Type[DeclarativeBase], data: list[dict[str:Any]]
+) -> None:
+    """Writes bulk data lists to the database whilst ignoring duplicates.
 
     Args:
-        models_class(DeclarativeBase): Class to target the destination table
-        data (List[dict]): A list of dictionaries containing the necessary keys for the given class
+        model_class: Class to target the destination table
+        data: A list of dictionaries containing the necessary keys for the given class
     """
-    # Duplicates are ignored whilst new data is written
-
     async with AsyncSessionLocal() as session:
-        statement = insert(models_class)
+        statement = insert(model_class)
 
-        if hasattr(models_class, "name"):
+        if hasattr(model_class, "name"):
             statement = statement.on_conflict_do_nothing(index_elements=["name"])
 
         await session.execute(statement, data)
         await session.commit()
 
 
-async def get_all_from_table(models_class):
-    """
-    Gets all records from a specified database table and flattens them into a clean list.
+async def get_all_from_table(
+    model_class: Type[DeclarativeBase],
+) -> Sequence[DeclarativeBase]:
+    """Gets all records from a specified database table and flattens them into a clean list.
 
     Args:
-        models_class (DeclarativeBase): Class to target the relevant table
+        model_class: Class to target the relevant table
 
     Returns:
-        list: containing SQLAlchemy model objects
+        A sequence containing the fetched SQLAlchemy live model objects.
     """
-    statement = select(models_class)
+    statement = select(model_class)
 
     async with AsyncSessionLocal() as session:
         result = await session.execute(statement)
 
         return result.scalars().all()
-
-
-async def get_skin_name_to_id_map():
-    """
-    Fetches all skins once and returns a dict mapping {name: id}
-
-    Returns:
-        dict: in the format {name: id} ({Rammus: 33})
-    """
-
-    async with AsyncSessionLocal() as session:
-        statement = select(models.Skin.name, models.Skin.id)
-        result = await session.execute(statement)
-        return dict(result.all())
-
-
-async def get_active_sales_with_skins():
-    """
-    Fetches all sales and loads their connected skin models.
-
-    Returns:
-        list: containing SQLAlchemy model objects
-    """
-    async with AsyncSessionLocal() as session:
-        statement = select(models.SkinSale).options(selectinload(models.SkinSale.skin))
-
-        result = await session.execute(statement)
-        return result.scalars().all()
-
-
-async def get_champion_skins(champion_name):
-    """
-    Fetches all skins that belong to a specific champion
-
-    Args:
-        champion_name (str): user input of a champion's name
-
-    Returns:
-        list[str]: containing the champions skin names
-    """
-
-    async with AsyncSessionLocal() as session:
-        statement = (
-            select(models.Champion)
-            .options(selectinload(models.Champion.skins))
-            .where(models.Champion.name == champion_name)
-        )
-
-        result = await session.execute(statement)
-        champion = result.scalars().first()
-
-        return [skin.name for skin in champion.skins]
