@@ -1,5 +1,4 @@
-"""
-cogs.skin_commands
+"""cogs.skin_commands
 ~~~~~~~~~~~~~~~~~~
 This module contains the 'SkinCommands' Cog, providing commands for any skin related functions.
 It handles skin validation from user input and fetching and displaying current skin sales.
@@ -10,14 +9,12 @@ Key Commands:
 """
 
 from discord.ext import commands
-from skins_manager import validator, storage
+
 import database.crud_skins as crud
-import database.models as models
 
 
 class SkinCommands(commands.Cog):
-    """
-    Commands that are relevant to skins or skin sales
+    """Commands that are relevant to skins or skin sales
     This cog provides commands for skin validation and fetching the list of current skin sales.
 
     Attributes:
@@ -29,8 +26,7 @@ class SkinCommands(commands.Cog):
 
     @commands.command()
     async def sales(self, ctx):
-        """
-        Fetches and displays the current week's skin sales.
+        """Fetches and displays the current week's skin sales.
 
         Retrieves the latest skin sales data from the web scraper and formats
         it into a single Discord message. If the scraper fails or returns no data,
@@ -49,27 +45,6 @@ class SkinCommands(commands.Cog):
         for sale in skins:
             message += f"• {sale.skin.name}: ~~{sale.original_price} RP~~ ➔ **{sale.sale_price} RP**\n"
         await ctx.send(message)
-
-    @commands.command()
-    async def skin_exist(self, ctx, *, message):
-        """
-        Validates whether the provided skin name exists in the database.
-
-        Compares the user's input against the complete list of valid skins
-        using the validator module.
-
-        Args:
-            ctx: The Discord context object for the command invocation.
-            message (str): The skin name to validate.
-
-        Raises:
-            commands.MissingRequiredArgument: If no skin name is provided.
-
-        Sends:
-            A Discord message indicating whether the skin is valid (True) or not (False).
-        """
-        # Uses the validator module to compare the user input to the valid list in the json file
-        await ctx.send(validator.check_skin(message))
 
     @commands.command(usage="!skins <champion> (Example: !skins kha'zix)")
     async def skins(self, ctx, *, message):
@@ -105,8 +80,7 @@ class SkinCommands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        """
-        Global error handler for commands in this cog.
+        """Global error handler for commands in this cog.
 
         Handles various command errors gracefully:
         - CommandNotFound: Silently ignores unknown commands.

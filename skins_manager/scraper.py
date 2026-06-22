@@ -12,7 +12,7 @@ import httpx
 from bs4 import BeautifulSoup
 from curl_cffi.requests import AsyncSession
 
-import database.crud as crud
+import database.crud_skins as crud
 
 # URL to the mobalytics weekly skin sale page
 URL = "https://mobalytics.gg/lol/guides/weekly-skin-sale"
@@ -61,19 +61,19 @@ async def get_skin_sales() -> list[dict[str, Any] | None]:
             skin_map = {clean_name(name): skin_id for name, skin_id in skin_map.items()}
 
             sales = []
-
             for sale in all_sale_data:
                 # Skins are returned in the format 'Dragonwing Corki-390 RP (975 RP)-60% Off'
                 # Splitting this way leaves only the relevant information
                 # i.e [Dragonwing Corki, 390 RP (975 RP)]
-                values = sale.rsplit("-", 2)
+                values = sale.split("-", 3)
 
                 skin_name = clean_name(values[0])
-                prices = values[1]
+
+                prices = values[1] + " " + values[2]
 
                 # Regex to find just the sale numbers from 390 RP (975 RP)
                 price = re.findall(r"\d+", prices)
-
+                print(price)
                 # Dictionary that matches the columns of the skin_sales table
                 sales.append(
                     {
