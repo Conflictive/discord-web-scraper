@@ -12,7 +12,7 @@ import httpx
 from bs4 import BeautifulSoup
 from curl_cffi.requests import AsyncSession
 
-import database.crud_skins as crud
+import src.database.repositories.skin_repo as crud
 
 # URL to the mobalytics weekly skin sale page
 URL = "https://mobalytics.gg/lol/guides/weekly-skin-sale"

@@ -2,8 +2,8 @@
 
 import asyncio
 
-import database.models  # noqa: F401
-from database.config import Base, engine
+import src.database.models  # noqa: F401
+from src.database.config import Base, engine
 
 
 async def init_db() -> None:

@@ -1,14 +1,13 @@
-from skins_manager.scraper import get_skin_sales
+from src.services.scraper import get_skin_sales
 
 
 async def test_get_skin_sales_returns_valid_data():
     """Test that the scraper connects, reads, and returns a list of strings."""
-
     result = await get_skin_sales()
 
-    assert (
-        len(result) > 0
-    ), "Scraper returned None, network or exception block triggered."
+    assert len(result) > 0, (
+        "Scraper returned None, network or exception block triggered."
+    )
 
     assert isinstance(result, list), f"Expected a list, got {type(result)} instead."
 

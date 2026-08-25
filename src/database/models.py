@@ -2,7 +2,6 @@
 
 Dependencies:
     - SQLAlchemy: `Mapped`, `mapped_column`, and SQL types used to define ORM models.
-    - config: Exposes `Base` (DeclarativeBase) used as the model base class.
 """
 
 from __future__ import annotations
@@ -10,9 +9,11 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from database.config import Base
+
+class Base(DeclarativeBase):
+    pass
 
 
 class User(Base):

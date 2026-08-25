@@ -1,11 +1,12 @@
-import pytest
-import pytest_asyncio
-from sqlalchemy.ext.asyncio import create_async_engine
-from database.config import Base, AsyncSessionLocal
-import database.models as models
 import os
-from dotenv import load_dotenv
 import urllib.parse
+
+import pytest_asyncio
+from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import create_async_engine
+
+import src.database.models as models
+from src.database.config import AsyncSessionLocal, Base
 
 load_dotenv()
 

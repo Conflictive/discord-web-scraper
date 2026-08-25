@@ -1,5 +1,4 @@
-"""
-Main Entry Point
+"""Main Entry Point
 ~~~~~~~~~~~~~~~~
 The primary script for the bot.
 This file uses dotenv to get environment variables, initialises the bot instance,
@@ -14,9 +13,10 @@ Dependencies:
 """
 
 import os
-from dotenv import load_dotenv
+
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 
 # 1. Load environment variables from the .env file
 load_dotenv()
@@ -24,9 +24,7 @@ TOKEN = os.getenv("TOKEN")
 
 
 class Bot:
-    """
-    Bot setup that configures intents and loads all of the command Cogs from the ./cogs directory.
-    """
+    """Bot setup that configures intents and loads all of the command Cogs from the ./cogs directory."""
 
     def __init__(self):
         # 2. Configure Intents: Required for reading message content in prefix commands
@@ -37,12 +35,12 @@ class Bot:
 
     async def load_extensions(self):
         """Iterates through the cogs folder and registers each Python file as an extension."""
-        for filename in os.listdir("./cogs"):
+        for filename in os.listdir("src/bot/cogs"):
             # Avoid using including __init__.py
             if filename.endswith(".py") and filename != "__init__.py":
                 # Load using dot-notation: cogs.filename
                 # filename[:-3] removes the file extension
-                await self.bot.load_extension(f"cogs.{filename[:-3]}")
+                await self.bot.load_extension(f"src.bot.cogs.{filename[:-3]}")
 
     async def main(self):
         """Startup for the bot"""

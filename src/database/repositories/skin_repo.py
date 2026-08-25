@@ -1,25 +1,23 @@
-"""
-crud_skins.py
+"""crud_skins.py
 ~~~~~~~~~~~~~~
 Module containing CRUD operations that are relevant to skins
 """
 
-from database.config import engine, AsyncSessionLocal
-import database.models as models
+import re
+
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from sqlalchemy.dialects.postgresql import insert
-import re
+
+import src.database.models as models
+from src.database.session import AsyncSessionLocal
 
 
 async def get_skin_name_to_id_map():
-    """
-    Fetches all skins once and returns a dict mapping {name: id}
+    """Fetches all skins once and returns a dict mapping {name: id}.
 
     Returns:
         dict: in the format {name: id} ({Rammus: 33})
     """
-
     async with AsyncSessionLocal() as session:
         statement = select(models.Skin.name, models.Skin.id)
         result = await session.execute(statement)
@@ -27,8 +25,7 @@ async def get_skin_name_to_id_map():
 
 
 async def get_active_sales_with_skins():
-    """
-    Fetches all sales and loads their connected skin models.
+    """Fetches all sales and loads their connected skin models.
 
     Returns:
         list: containing SQLAlchemy model objects
@@ -41,8 +38,7 @@ async def get_active_sales_with_skins():
 
 
 async def get_champion_skins(champion_name):
-    """
-    Fetches all skins that belong to a specific champion
+    """Fetches all skins that belong to a specific champion.
 
     Args:
         champion_name (str): user input of a champion's name

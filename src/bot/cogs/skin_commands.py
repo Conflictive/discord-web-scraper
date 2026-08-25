@@ -10,7 +10,7 @@ Key Commands:
 
 from discord.ext import commands
 
-import database.crud_skins as crud
+import src.database.repositories.skin_repo as skin
 
 
 class SkinCommands(commands.Cog):
@@ -41,7 +41,7 @@ class SkinCommands(commands.Cog):
         """
         message = "**This week's skin sales:**\n"
 
-        skins = await crud.get_active_sales_with_skins()
+        skins = await skin.get_active_sales_with_skins()
         for sale in skins:
             message += f"• {sale.skin.name}: ~~{sale.original_price} RP~~ ➔ **{sale.sale_price} RP**\n"
         await ctx.send(message)
@@ -65,7 +65,7 @@ class SkinCommands(commands.Cog):
             A formatted Discord message with the champion name and their complete skin list.
         """
         try:
-            name, skins = await crud.get_champion_skins(message)
+            name, skins = await skin.get_champion_skins(message)
 
             # TODO: Improve error handling to be more specific and robust
             if len(skins) < 1:

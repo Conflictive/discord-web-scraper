@@ -1,5 +1,4 @@
-"""
-database.config.py
+"""database.config.py
 ~~~~~~~~~~~~~~~~
 This module is for setting up and configuring the connection to the PostgreSQL database
 
@@ -12,9 +11,8 @@ Dependencies:
 
 import os
 import urllib.parse
+
 from dotenv import load_dotenv
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
 
 load_dotenv()
 
@@ -24,13 +22,3 @@ db_pass = os.environ.get("DB_PASS")
 db_pass = urllib.parse.quote_plus(db_pass)
 
 DATABASE_URL = f"postgresql+asyncpg://{db_user}:{db_pass}@{db_url}"
-
-engine = create_async_engine(DATABASE_URL, echo=True)
-
-AsyncSessionLocal = async_sessionmaker(
-    autoflush=False, bind=engine, expire_on_commit=False
-)
-
-
-class Base(DeclarativeBase):
-    pass
