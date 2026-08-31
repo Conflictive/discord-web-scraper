@@ -8,9 +8,13 @@ Key Commands:
     - !skin_exist: Validates if a skin name is legitimate.
 """
 
+import os
+
 from discord.ext import commands
 
 import src.database.repositories.skin_repo as skin
+
+API_BASE_URL = os.environ.get("API_BASE_URL")
 
 
 class SkinCommands(commands.Cog):

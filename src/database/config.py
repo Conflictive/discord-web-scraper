@@ -1,12 +1,6 @@
-"""database.config.py
-~~~~~~~~~~~~~~~~
-This module is for setting up and configuring the connection to the PostgreSQL database
+"""Configures the URL for the PostgreSQL database.
 
-Dependencies:
-    - urllib: For parsing unsupported characters in the db password
-    - os, dotenv: For loading environment variables from .env files
-    - psycopg2: PostgreSQL adapter for Python
-    - sqlalchemy: ORM and SQL toolkit
+Recreates the db url using .env variables.
 """
 
 import os

@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import DeclarativeBase
 
-from src.database.config import AsyncSessionLocal
+from src.database.session import AsyncSessionLocal
 
 
 async def bulk_db_write(
