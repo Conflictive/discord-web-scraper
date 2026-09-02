@@ -1,6 +1,6 @@
 """Main API route handler.
 
-Creates the API instance and adds the other routes,
+Creates the API instance and adds the API routes,
 also provides endpoints for generic API functions.
 """
 
@@ -25,6 +25,6 @@ async def health_check():
     """Returns message to confirm API is running.
 
     Returns:
-        dict[str, str]: A dictionary containing the operational status message.
+        A dictionary containing the operational status message.
     """
     return {"health": "good"}

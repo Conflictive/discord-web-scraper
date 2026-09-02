@@ -1,61 +1,68 @@
-"""crud_skins.py
-~~~~~~~~~~~~~~
-Module containing CRUD operations that are relevant to skins
-"""
+"""Module for handling all CRUD operations that are relevant to skins."""
 
 import re
+from typing import Sequence
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 import src.database.models as models
-from src.database.session import AsyncSessionLocal
 
 
-async def get_skin_name_to_id_map():
+async def get_skin_name_to_id_map(session: AsyncSession) -> dict[str, int]:
     """Fetches all skins once and returns a dict mapping {name: id}.
+
+    Args:
+        session: Active request-scoped database session.
 
     Returns:
         dict: in the format {name: id} ({Rammus: 33})
     """
-    async with AsyncSessionLocal() as session:
-        statement = select(models.Skin.name, models.Skin.id)
-        result = await session.execute(statement)
-        return dict(result.all())
+    statement = select(models.Skin.name, models.Skin.id)
+    result = await session.execute(statement)
+    return dict(result.all())
 
 
-async def get_active_sales_with_skins():
+async def get_active_sales_with_skins(
+    session: AsyncSession,
+) -> Sequence[models.SkinSale]:
     """Fetches all sales and loads their connected skin models.
 
+    Args:
+        session: Active request-scoped database session.
+
     Returns:
-        list: containing SQLAlchemy model objects
+        Sequence[models.SkinSale]: Fetched SkinSale model instances with skins loaded.
     """
-    async with AsyncSessionLocal() as session:
-        statement = select(models.SkinSale).options(selectinload(models.SkinSale.skin))
+    statement = select(models.SkinSale).options(selectinload(models.SkinSale.skin))
 
-        result = await session.execute(statement)
-        return result.scalars().all()
+    result = await session.execute(statement)
+    return result.scalars().all()
 
 
-async def get_champion_skins(champion_name):
+async def get_champion_skins(
+    session: AsyncSession, champion_name: str
+) -> tuple[str, list[str]]:
     """Fetches all skins that belong to a specific champion.
 
     Args:
-        champion_name (str): user input of a champion's name
+        session: Active request-scoped database session.
+        champion_name: user input of a champion's name
 
     Returns:
-        list[str]: containing the champions skin names
+        tuple[str, list[str]] | None: A tuple containing (official_name, skin_names),
+        or None if no champion matches the search string.
     """
     champion_name = re.sub(r"[\s'\-\.\/:,]", "", champion_name).lower()
 
-    async with AsyncSessionLocal() as session:
-        statement = (
-            select(models.Champion)
-            .options(selectinload(models.Champion.skins))
-            .where(models.Champion.search_name == champion_name)
-        )
+    statement = (
+        select(models.Champion)
+        .options(selectinload(models.Champion.skins))
+        .where(models.Champion.search_name == champion_name)
+    )
 
-        result = await session.execute(statement)
-        champion = result.scalars().first()
+    result = await session.execute(statement)
+    champion = result.scalars().first()
 
-        return champion.name, [skin.name for skin in champion.skins]
+    return champion.name, [skin.name for skin in champion.skins]
