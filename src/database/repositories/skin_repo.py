@@ -17,7 +17,7 @@ async def get_skin_name_to_id_map(session: AsyncSession) -> dict[str, int]:
         session: Active request-scoped database session.
 
     Returns:
-        dict: in the format {name: id} ({Rammus: 33})
+        dict[str, int]: in the format {name: id} ({Rammus: 33})
     """
     statement = select(models.Skin.name, models.Skin.id)
     result = await session.execute(statement)

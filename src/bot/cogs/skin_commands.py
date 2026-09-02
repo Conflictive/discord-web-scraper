@@ -8,13 +8,12 @@ Key Commands:
     - !skin_exist: Validates if a skin name is legitimate.
 """
 
-import os
-
+import httpx
 from discord.ext import commands
 
 import src.database.repositories.skin_repo as skin
 
-API_BASE_URL = os.environ.get("API_BASE_URL")
+API_BASE_URL = "http://localhost:8000"
 
 
 class SkinCommands(commands.Cog):
@@ -51,34 +50,40 @@ class SkinCommands(commands.Cog):
         await ctx.send(message)
 
     @commands.command(usage="!skins <champion> (Example: !skins kha'zix)")
-    async def skins(self, ctx, *, message):
-        """Returns a list containing all of a champions skins.
+    async def skins(self, ctx: commands.Context, *, message: str) -> None:
+        """Returns a list containing all of a champion's skins.
 
-        Filters the skin database for all skins belonging to a specified champion.
-        The search is case-insensitive and ignores spaces, so both 'miss fortune'
-        and 'missfortune' will match the champion.
+        Queries the external FastAPI backend for skins belonging to the
+        specified champion.
 
         Args:
             ctx: The Discord context object for the command invocation.
-            message (str): The champion name to search for (e.g., "Rammus", "Miss Fortune").
-
-        Raises:
-            commands.MissingRequiredArgument: If no champion name is provided.
-
-        Sends:
-            A formatted Discord message with the champion name and their complete skin list.
+            message: The champion name to search for (e.g., "Rammus", "Miss Fortune").
         """
-        try:
-            name, skins = await skin.get_champion_skins(message)
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(
+                    f"{API_BASE_URL}/champions/{message}/skins",
+                    timeout=5.0,
+                )
 
-            # TODO: Improve error handling to be more specific and robust
-            if len(skins) < 1:
-                reply = "Something went wrong."
-            else:
-                reply = f"**{name}:**\n" + "\n".join(skins)
-        except Exception as e:
-            reply = "Something went wrong."
-            print(e)
+                if response.status_code == 404:
+                    reply = f"Could not find champion '{message}'."
+                elif response.status_code == 200:
+                    data = response.json()
+                    name, skins = data
+
+                    if not skins:
+                        reply = f"No skins found for **{name}**."
+                    else:
+                        reply = f"**{name}:**\n" + "\n".join(skins)
+                else:
+                    reply = "An unexpected error occurred. Please try again later."
+
+            except httpx.RequestError as exc:
+                # Triggers if the FastAPI backend server is offline or unreachable
+                reply = "Unable to connect to the skin database service."
+                print(f"HTTP Request failed: {exc}")
 
         await ctx.send(reply)
 

@@ -21,7 +21,6 @@ from dotenv import load_dotenv
 # 1. Load environment variables from the .env file
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-API_BASE_URL = os.environ.get("API_BASE_URL")
 
 
 class Bot:
