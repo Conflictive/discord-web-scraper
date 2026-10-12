@@ -171,7 +171,7 @@ class SkinSale(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
     skin_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("skins.id", ondelete="CASCADE"), nullable=False
+        BigInteger, ForeignKey("skins.id", ondelete="CASCADE"), nullable=False
     )
 
     # Pricing data
