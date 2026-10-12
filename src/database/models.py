@@ -8,7 +8,14 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String
+from sqlalchemy import (
+    BigInteger,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -117,6 +124,10 @@ class Subscription(Base):
 
     __tablename__ = "subscriptions"
 
+    __table_args__ = (
+        UniqueConstraint("user_id", "skin_id", name="uq_subscription_user_skin"),
+    )
+
     # Columns
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
@@ -177,4 +188,4 @@ class SkinSale(Base):
 
     # Relationships
     # A sale has multiple skins
-    skin: Mapped["Skin"] = relationship(back_populates="sales")
+    skin: Mapped["Skin"] = relationship(back_populates="sales", passive_deletes=True)
