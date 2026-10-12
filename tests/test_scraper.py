@@ -1,9 +1,9 @@
 from src.services.scraper import get_skin_sales
 
 
-async def test_get_skin_sales_returns_valid_data():
+async def test_get_skin_sales_returns_valid_data(db_session):
     """Test that the scraper connects, reads, and returns a list of strings."""
-    result = await get_skin_sales()
+    result = await get_skin_sales(db_session)
 
     assert len(result) > 0, (
         "Scraper returned None, network or exception block triggered."

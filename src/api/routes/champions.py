@@ -19,7 +19,7 @@ router = APIRouter(prefix="/champions", tags=["champions"])
     "/",
     response_model=list[ChampionResponse],
     status_code=status.HTTP_200_OK,
-    summary="List all skins",
+    summary="List all champions",
 )
 async def list_champions(db: AsyncSession = Depends(get_db)):
     """Retrieves a list of all champions in the database.

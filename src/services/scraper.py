@@ -32,7 +32,7 @@ def clean_name(name: str) -> str:
     return "".join(name.split())
 
 
-async def get_skin_sales() -> list[dict[str, Any] | None]:
+async def get_skin_sales(session) -> list[dict[str, Any] | None]:
     """Fetches and processes the current list of skin sales.
 
     Uses a browser impersonating HTTP client to scrape DOM elements from the site,
@@ -54,7 +54,7 @@ async def get_skin_sales() -> list[dict[str, Any] | None]:
 
             # Instead of running a query for each skin name that appears
             # just create the entire map so only one query is used
-            skin_map = await crud.get_skin_name_to_id_map()
+            skin_map = await crud.get_skin_name_to_id_map(session)
 
             # Transform {"PROJECT Yasuo": 33005} -> {"projectyasuo": 33005}
             # to avoid issues with certain skins that may have special characters
